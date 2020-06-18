@@ -1,42 +1,87 @@
-const http = require('http');
+const express = require('express');
+const port =3000;
+const app =express();
 
-const server = http.createServer((Request,Response)=>{
-   switch(Request.url)
-   {
-        case '/':
-            Response.writeHead(200,{
-            'Content-Type':'text/html'
-            });
-           Response.write('<input />');
-           break;
-        case '/login':
-            Response.writeHead(200,{
-                'Content-Type':'text/html'
-            });
-           Response.write('用户名:<input />');
-           Response.write('密码:<input />');
-           Response.write('<button />');
-           break;
-        case '/JSON':
-            const dtat={
-                'id':1,
-                'title':'关山月',
-                'content':'明月出天山，苍茫云海间'
-            }
+/**
+ * 使用JSON中间件
+ */
+app.use(express.json());
 
-            const jsonData = JSON.stringify(data);
-            Response.writeHead(200,{
-                'Content-Type':'application/json;charset=utf-8'
-            });
-            Response.write(jsonData);
-            break;
-        default:
-            Response.write('404');
-            break;
-   }
-   Response.end();
-})
-
-server.listen(3000,()=>{
-    console.log('∈服务器启动');
+app.listen(port,()=>{
+    console.log("ΘΞω服务器启动");
 });
+
+const data =[
+    {
+        id:1,
+        title:'春望',
+        content:'国破山河在'
+    },
+    {
+        id:2,
+        title:'彩云追月',
+        content:'明月几时有'
+    },
+    {
+        id:3,
+        title:'春夜喜雨',
+        content:'随风潜入夜'
+    }
+];
+
+/**
+ * 根目录
+ */
+app.get('/',(require,respond)=>{
+    respond.send(data);
+});
+
+/**
+ * 参数传递
+ */
+app.get('/posts/:postID',(require,respond)=>{
+    const {postID} = require.params;
+    console.log(postID);
+    const posts = data.filter(item=>item.id == postID);
+    respond.send(posts[0]);
+});
+/**
+ * 登录
+ */
+app.get('/login/:username/:pwd',(require,respond)=>{
+    console.log(require.params);
+    const {username,pwd} =require.params;
+    if(username == 'abc' && pwd == '123')
+    {
+        respond.send('success');
+    }
+    else
+    {
+        respond.send('fail');
+    }
+    
+});
+/**
+ * 取内容
+ */
+app.post('/content',(request,respond)=>{
+
+    const {content} = request.body;
+    
+    /**
+     * 设置状态码
+     */
+    //respond.status(201);
+    
+    //request.header['application/x-www-form-urlencoded']
+    console.log(request.params);
+    console.log(request.data);
+    console.log(request.data);
+    console.log(request.headers);
+    respond.send(request.headers);
+
+    // respond.send({
+    //     "msg":`成功接收数据: ${request.body}`
+    // });
+});
+
